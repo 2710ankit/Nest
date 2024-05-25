@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
@@ -20,7 +21,11 @@ export class Task {
   @Column({ name: 'status', nullable: false })
   status: boolean;
 
-  @ManyToOne(() => User, (user) => user.task)
+  @Column({ name: 'image', nullable: false })
+  image: string;
+
+  @ManyToOne(() => User, (user) => user.task, {})
+  @JoinColumn({ name: 'userId' })
   userId: User;
 
   @CreateDateColumn({
