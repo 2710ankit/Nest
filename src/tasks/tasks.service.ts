@@ -1,9 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Task } from './entities/task.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TasksService {
+  constructor(
+    @InjectRepository(Task)
+    private taskRepo: Repository<Task>,
+  ) {}
   taskList = [
     {
       task: 'task1',
@@ -11,26 +18,33 @@ export class TasksService {
       image: 'some photo',
     },
   ];
-  create(createTaskDto: CreateTaskDto) {
-    const { task, image } = createTaskDto;
+  async create(createTaskDto: CreateTaskDto) {
+    const { task, image, status } = createTaskDto;
 
-    if (!task || !image) throw new BadRequestException('Data is not Valid');
+    if (!task || !image || status === undefined || null)
+      throw new BadRequestException('Data is not Valid');
 
-    this.taskList.push({
-      task,
-      createdAt: new Date(),
-      image,
-    });
+    const newTask = this.taskRepo.create(createTaskDto);
+    await this.taskRepo.save(newTask);
+
     return {
       message: 'success',
-      data: this.taskList,
+      data: newTask,
     };
   }
 
-  findAll() {
+  async findAll() {
+    // TODO :- check user is logged in or not,
+    // TODO :- check user is valid or not
+    // TODO :- show user specific data,
+
+    const tasks = await this.taskRepo.find({
+      relations:['userId']
+    });
+
     return {
       message: 'success',
-      data: this.taskList,
+      data: tasks,
     };
   }
 

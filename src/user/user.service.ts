@@ -5,42 +5,65 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
+  constructor(
+    @InjectRepository(User)
+    private userRepo: Repository<User>,
+  ) {}
   loginCred = {
     username: 'ankit',
     password: 'asdasdasd',
   };
 
-  signIn(createUserDto: CreateUserDto) {
+  async signIn(createUserDto: CreateUserDto) {
     const { username, password } = createUserDto;
 
     if (!username || !password)
       throw new BadRequestException('Username or Password not found');
 
-    if (
-      username !== this.loginCred.username ||
-      password !== this.loginCred.password
-    )
-      throw new UnauthorizedException('Username or Password not Correct');
+    const user = await this.userRepo.findOne({
+      where: {
+        username,
+        password
+      },
+    });
+
+    console.log(user)
+
+    if (!user) throw new BadRequestException('Invalid Username or password');
 
     return 'Logged in successfully';
   }
 
-  createUser(createUserDto: any) {
+  async createUser(createUserDto: any) {
     const { username, password } = createUserDto;
- 
+
     if (!username || !password)
       throw new BadRequestException('Username or Password not found');
 
-    //  TODO :- check for already existing user
+    const user = await this.userRepo.findOne({
+      where: {
+        username,
+      },
+    });
 
-    this.loginCred = { ...createUserDto };
+    if (user) throw new BadRequestException('Username already exists');
+
+    const newUser = this.userRepo.create({
+      username: username,
+      password: password,
+    });
+
+    await this.userRepo.save(newUser);
 
     return {
       message: 'success',
-      data: createUserDto,
+      data: newUser,
     };
   }
 
