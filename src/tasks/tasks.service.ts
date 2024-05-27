@@ -4,12 +4,17 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
 import { Repository } from 'typeorm';
+import { Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private taskRepo: Repository<Task>,
+
+    private jwtService: JwtService,
   ) {}
   taskList = [
     {
@@ -18,13 +23,15 @@ export class TasksService {
       image: 'some photo',
     },
   ];
-  async create(createTaskDto: CreateTaskDto) {
+  async create(createTaskDto: CreateTaskDto, req: Request) {
     const { task, image, status } = createTaskDto;
 
     if (!task || !image || status === undefined || null)
       throw new BadRequestException('Data is not Valid');
 
-    const newTask = this.taskRepo.create(createTaskDto);
+    const { userId } = this.jwtService.decode(req.cookies.token);
+
+    const newTask = this.taskRepo.create({ ...createTaskDto, user: userId });
     await this.taskRepo.save(newTask);
 
     return {
@@ -33,19 +40,25 @@ export class TasksService {
     };
   }
 
-  async findAll() {
-    // TODO :- check user is logged in or not,
-    // TODO :- check user is valid or not
-    // TODO :- show user specific data,
+  async findAll(req: Request) {
+    const { userId } = this.jwtService.decode(req.cookies.token);
 
-    const tasks = await this.taskRepo.find({
-      relations:['userId']
-    });
-
-    return {
-      message: 'success',
-      data: tasks,
-    };
+    try {
+      const tasks = await this.taskRepo.find({
+        where: {
+          user: {
+            id: userId,
+          },
+        },
+        relations: ['user'],
+      });
+      return {
+        message: 'success',
+        data: tasks,
+      };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   findOne(id: number) {

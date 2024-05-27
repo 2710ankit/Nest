@@ -33,7 +33,7 @@ export class User {
   })
   updatedAt: Date;
 
-  @OneToMany(() => Task, (task) => task.userId)
+  @OneToMany(() => Task, (task) => task.user)
   task: Task;
 
   // @BeforeInsert()

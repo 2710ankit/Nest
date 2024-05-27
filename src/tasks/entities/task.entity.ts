@@ -26,7 +26,7 @@ export class Task {
 
   @ManyToOne(() => User, (user) => user.task, {})
   @JoinColumn({ name: 'userId' })
-  userId: User;
+  user: User;
 
   @CreateDateColumn({
     type: 'timestamp',
