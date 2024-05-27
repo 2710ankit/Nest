@@ -8,6 +8,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { compareHash, generateHash } from 'src/utils/bcrypt.util';
 
 @Injectable()
 export class UserService {
@@ -29,13 +30,12 @@ export class UserService {
     const user = await this.userRepo.findOne({
       where: {
         username,
-        password
       },
     });
 
-    console.log(user)
-
-    if (!user) throw new BadRequestException('Invalid Username or password');
+    if (!user || !(await compareHash(password, user.password))) {
+      throw new UnauthorizedException('Username or Password INVALID');
+    }
 
     return 'Logged in successfully';
   }
@@ -53,10 +53,10 @@ export class UserService {
     });
 
     if (user) throw new BadRequestException('Username already exists');
-
+    const hash = await generateHash(password);
     const newUser = this.userRepo.create({
       username: username,
-      password: password,
+      password: hash,
     });
 
     await this.userRepo.save(newUser);
