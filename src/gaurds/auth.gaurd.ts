@@ -46,6 +46,6 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    return request.cookies?.token;
+    return request.header('Authorization');
   }
 }

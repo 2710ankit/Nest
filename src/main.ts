@@ -8,7 +8,10 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.setGlobalPrefix('/api');
   app.use(cookieParser());
-  app.enableCors();
+  app.enableCors({
+    exposedHeaders: ['Authorization'],
+    credentials:true
+  });
   await app.listen(3001);
 }
 bootstrap();

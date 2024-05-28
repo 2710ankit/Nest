@@ -41,7 +41,7 @@ export class TasksService {
   }
 
   async findAll(req: Request) {
-    const { userId } = this.jwtService.decode(req.cookies.token);
+    const { userId } = this.jwtService.decode(req.header("Authorization"));
 
     try {
       const tasks = await this.taskRepo.find({

@@ -45,18 +45,12 @@ export class AuthService {
 
     const token = await this.jwtService.signAsync({ userId: user.id });
 
-    return res
-      .cookie('token', token, {
-        expires: new Date(Date.now() + 900000),
-        httpOnly: true,
-      })
-      .status(200)
-      .json({
-        status: 'success',
-        data: {
-          user,
-        },
-      });
+    return res.setHeader('Authorization', token).status(200).json({
+      status: 'success',
+      data: {
+        user,
+      },
+    });
   }
 
   async createUser(createUserDto: any) {
