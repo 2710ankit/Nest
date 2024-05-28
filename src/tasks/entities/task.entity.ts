@@ -24,8 +24,8 @@ export class Task {
   @Column({ name: 'image', nullable: false })
   image: string;
 
-  @ManyToOne(() => User, (user) => user.task, {})
-  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => User, (user) => user.task, {onDelete:'CASCADE'})
+  @JoinColumn({ name: 'userId', })
   user: User;
 
   @CreateDateColumn({

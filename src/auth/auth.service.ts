@@ -54,30 +54,37 @@ export class AuthService {
   }
 
   async createUser(createUserDto: any) {
-    const { username, password } = createUserDto;
+    try {
+      let { username, password, roles } = createUserDto;
 
-    if (!username || !password)
-      throw new BadRequestException('Username or Password not found');
+      if (!username || !password)
+        throw new BadRequestException('Username or Password not found');
 
-    const user = await this.userRepo.findOne({
-      where: {
-        username,
-      },
-    });
+      const user = await this.userRepo.findOne({
+        where: {
+          username,
+        },
+      });
 
-    if (user) throw new BadRequestException('Username already exists');
-    const hash = await generateHash(password);
-    const newUser = this.userRepo.create({
-      username: username,
-      password: hash,
-    });
+      roles = roles ?? ['user'];
 
-    await this.userRepo.save(newUser);
+      if (user) throw new BadRequestException('Username already exists');
+      const hash = await generateHash(password);
+      const newUser = this.userRepo.create({
+        username: username,
+        password: hash,
+        roles: roles,
+      });
 
-    return {
-      message: 'success',
-      data: newUser,
-    };
+      await this.userRepo.save(newUser);
+
+      return {
+        message: 'success',
+        data: newUser,
+      };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   findAll() {
@@ -96,7 +103,15 @@ export class AuthService {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    try {
+      await this.userRepo.delete(id);
+    } catch (error) {
+      console.log(error);
+    }
+    return {
+      message: 'success',
+      // data: newUser,
+    };
   }
 }
