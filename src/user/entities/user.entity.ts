@@ -21,6 +21,9 @@ export class User {
   @Column({ name: 'password', nullable: false, type: 'varchar' })
   password: string;
 
+  @Column({name:'role',type:"simple-array", nullable:false})
+  roles:string[]
+
   @CreateDateColumn({
     type: 'timestamp',
     nullable: false,

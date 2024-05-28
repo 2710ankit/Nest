@@ -6,7 +6,7 @@ import { Task } from './entities/task.entity';
 import { Repository } from 'typeorm';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/user/entities/user.entity';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class TasksService {
@@ -15,6 +15,7 @@ export class TasksService {
     private taskRepo: Repository<Task>,
 
     private jwtService: JwtService,
+    private authService: AuthService,
   ) {}
   taskList = [
     {
@@ -41,14 +42,22 @@ export class TasksService {
   }
 
   async findAll(req: Request) {
-    const { userId } = this.jwtService.decode(req.header("Authorization"));
+    const { userId } = this.jwtService.decode(req.header('Authorization'));
 
     try {
-      const tasks = await this.taskRepo.find({
-        where: {
+      let searchQuery = {};
+      const user = await this.authService.findOne(userId);
+      if (user.roles.includes('user')) {
+        console.log('first');
+        searchQuery = {
           user: {
             id: userId,
           },
+        };
+      }
+      const tasks = await this.taskRepo.find({
+        where: {
+          ...searchQuery,
         },
         relations: ['user'],
       });
