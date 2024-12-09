@@ -4,6 +4,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { AuthController } from './auth.controller';
+import { Otp, OtpSchema } from './schema/otp.shema';
+import { MongooseModule } from '@nestjs/mongoose';
 
 export const SECRET_KEY = 'lsfjnosns@#$%^&hjbad';
 @Module({
@@ -18,6 +20,7 @@ export const SECRET_KEY = 'lsfjnosns@#$%^&hjbad';
       },
     }),
     TypeOrmModule.forFeature([User]),
+    MongooseModule.forFeature([{ name: Otp.name, schema: OtpSchema }]),
   ],
 })
 export class AuthModule {}

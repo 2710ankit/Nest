@@ -7,11 +7,15 @@ import {
   Patch,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { Response } from 'express';
+import { AuthGuard } from 'src/gaurds/auth.gaurd';
+import { Asd } from 'src/gaurds/sfh';
+// import { AuthGuard } from 'src/gaurds/auth.gaurd';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +23,13 @@ export class AuthController {
 
   @Post('sign-up')
   createUser(@Body() createUserDto: CreateUserDto) {
+    return this.authService.createUser(createUserDto);
+  }
+
+  
+  @Post('verify-otp')
+  @UseGuards(Asd)
+  verifyOtp(@Body() createUserDto: CreateUserDto) {
     return this.authService.createUser(createUserDto);
   }
 

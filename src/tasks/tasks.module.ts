@@ -1,19 +1,23 @@
 import { Module } from '@nestjs/common';
-import { TasksService } from './tasks.service';
-import { TasksController } from './tasks.controller';
+import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Task } from './entities/task.entity';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from 'src/gaurds/auth.gaurd';
 import { AuthService } from 'src/auth/auth.service';
+import { Otp, OtpSchema } from 'src/auth/schema/otp.shema';
 import { User } from 'src/user/entities/user.entity';
+import { Task } from './entities/task.entity';
+import { TaskLog, TaskLogSchema } from './schema/tasks-logs.schema';
+import { TasksController } from './tasks.controller';
+import { TasksService } from './tasks.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Task, User])],
-  controllers: [TasksController],
-  providers: [
-    TasksService,
-    AuthService
+  imports: [
+    TypeOrmModule.forFeature([Task, User]),
+    MongooseModule.forFeature([
+      { name: TaskLog.name, schema: TaskLogSchema },
+      { name: Otp.name, schema: OtpSchema },
+    ]),
   ],
+  controllers: [TasksController],
+  providers: [TasksService, AuthService],
 })
 export class TasksModule {}

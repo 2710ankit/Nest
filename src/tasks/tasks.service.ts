@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,12 +12,18 @@ import { Repository } from 'typeorm';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from 'src/auth/auth.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { TaskLog } from './schema/tasks-logs.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private taskRepo: Repository<Task>,
+
+    @InjectModel(TaskLog.name)
+    private taskLogsModel: Model<TaskLog>,
 
     private jwtService: JwtService,
     private authService: AuthService,
@@ -30,25 +41,37 @@ export class TasksService {
     if (!task || !image || status === undefined || null)
       throw new BadRequestException('Data is not Valid');
 
-    const { userId } = this.jwtService.decode(req.cookies.token);
+    const { userId } = this.jwtService.decode(req.header('Authorization'));
+    try {
+      const newTask = this.taskRepo.create({ ...createTaskDto, user: userId });
+      await this.taskRepo.save(newTask);
 
-    const newTask = this.taskRepo.create({ ...createTaskDto, user: userId });
-    await this.taskRepo.save(newTask);
+      const logger = new Logger('SQL');
 
-    return {
-      message: 'success',
-      data: newTask,
-    };
-  }
+      logger.error("SOME ERROR")
 
+      const createTaskLog = new this.taskLogsModel({
+        query: 'some query',
+        taskId: newTask.id,
+      });
+
+      await createTaskLog.save();
+
+      return {
+        message: 'success',
+        data: newTask,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  } 
   async findAll(req: Request) {
     const { userId } = this.jwtService.decode(req.header('Authorization'));
-
+    console.log(req.header("Authorization"), userId)
     try {
       let searchQuery = {};
-      const user = await this.authService.findOne(userId);
-      if (user.roles.includes('user')) {
-        console.log('first');
+      const user = await this.authService.findOne(userId); 
+      if (user.roles.includes('user')) { 
         searchQuery = {
           user: {
             id: userId,

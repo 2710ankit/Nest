@@ -1,5 +1,6 @@
 import { User } from 'src/user/entities/user.entity';
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -39,4 +40,13 @@ export class Task {
     nullable: false,
   })
   updatedAt: Date;
+
+
+  @BeforeInsert()
+  private setCreateDate(): void {
+    console.log('before insert')
+
+    
+    // this.createdAt = new Date();s
+  }
 }
