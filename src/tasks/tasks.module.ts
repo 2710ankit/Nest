@@ -8,6 +8,7 @@ import { Task } from './entities/task.entity';
 import { TaskLog, TaskLogSchema } from './schema/tasks-logs.schema';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -16,6 +17,9 @@ import { TasksService } from './tasks.service';
       { name: TaskLog.name, schema: TaskLogSchema },
       { name: Otp.name, schema: OtpSchema },
     ]),
+    MulterModule.register({
+      dest: './uploads', 
+    }),
   ],
   controllers: [TasksController],
   providers: [TasksService, AuthService],

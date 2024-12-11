@@ -101,7 +101,39 @@ export class TasksService {
     return `This action updates a #${id} task`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(req: Request, taskId: string) {
+    const { userId } = this.jwtService.decode(req.header('Authorization'));
+    if(!userId){
+      throw new Error("Not Authorized")
+    }
+    try {
+      let searchQuery = {};
+      const user = await this.authService.findOne(userId); 
+      if (user.roles.includes('user')) { 
+        searchQuery = {
+          user: {
+            id: userId,
+          },
+        };
+      }  
+      const tasks = await this.taskRepo.update(taskId,{
+        task:"after update"
+      });
+      return {
+        message: 'success',
+        data: [],
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async uploadFile(file:Express.Multer.File){
+    return {
+      originalname: file.originalname,
+      filename: file.filename,
+      size: file.size,
+      mimetype: file.mimetype,
+    };
   }
 }

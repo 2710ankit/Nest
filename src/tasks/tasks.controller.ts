@@ -8,19 +8,23 @@ import {
   Delete,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { AuthGuard } from 'src/gaurds/auth.gaurd';
 import { Request } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
   create(@Body() createTaskDto: CreateTaskDto, @Req() req: Request) {
     return this.tasksService.create(createTaskDto,req);
   }
@@ -41,7 +45,14 @@ export class TasksController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(+id);
+  remove(@Req() req:Request, @Param('id') id: string) {
+    return this.tasksService.remove(req, id);
   }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+    return this.tasksService.uploadFile(file);
+}
 }

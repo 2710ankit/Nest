@@ -8,6 +8,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.setGlobalPrefix('/api');
   app.use(cookieParser());
+  // const upload = multee({ dest: 'uploads/' })
   app.enableCors({
     exposedHeaders: ['Authorization'],
     credentials:true
