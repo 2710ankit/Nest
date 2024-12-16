@@ -38,6 +38,7 @@ export class AuthController {
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    console.log('congroller')
     await this.authService.signIn(createUserDto, res);
     return;
   }

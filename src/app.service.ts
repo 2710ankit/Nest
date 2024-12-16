@@ -6,9 +6,11 @@ import { RedisService } from './redis/redis.service';
 export class AppService {
   constructor(private redisServie: RedisService) {}
   async getHello() {
+ 
     try {
-      await this.redisServie.setCache('name1', 'Ankit');
-      await this.redisServie.getCache('name1');
+      await this.redisServie.setCache('name', 'Ankit', 10000);
+      // this.redisServie.clearCache()
+      // await this.redisServie.getCache('name1');
     } catch (error) {
       console.log(error);
       return error;

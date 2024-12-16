@@ -6,11 +6,10 @@ import { User } from 'src/user/entities/user.entity';
 import { AuthController } from './auth.controller';
 import { Otp, OtpSchema } from './schema/otp.shema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { RedisModule } from 'src/redis/redis.module';
 
 export const SECRET_KEY = 'lsfjnosns@#$%^&hjbad';
 @Module({
-  controllers: [AuthController],
-  providers: [AuthService],
   imports: [
     JwtModule.register({
       global: true,
@@ -21,6 +20,9 @@ export const SECRET_KEY = 'lsfjnosns@#$%^&hjbad';
     }),
     TypeOrmModule.forFeature([User]),
     MongooseModule.forFeature([{ name: Otp.name, schema: OtpSchema }]),
+    RedisModule,
   ],
+  controllers: [AuthController], 
+  providers: [AuthService],
 })
 export class AuthModule {}

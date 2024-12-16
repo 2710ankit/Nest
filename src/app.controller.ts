@@ -6,7 +6,7 @@ import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @UseInterceptors(CacheInterceptor)
+  // @UseInterceptors(CacheInterceptor)
   // @CacheKey("name")
   @Get()
   getHello() {

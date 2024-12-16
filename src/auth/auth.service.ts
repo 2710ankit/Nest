@@ -19,6 +19,8 @@ import { SaveOtpDto } from './dto/save-otp.dto';
 import { Otp } from './schema/otp.shema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { RedisService } from 'src/redis/redis.service';
+import { v4 as uuidv4 } from 'uuid';
 
 // import { constants } from './constants';
 
@@ -32,6 +34,7 @@ export class AuthService {
     private otpModel: Model<Otp>,
 
     private jwtService: JwtService,
+    private readonly redisService: RedisService,
   ) {}
   loginCred = {
     username: 'ankit',
@@ -40,6 +43,7 @@ export class AuthService {
 
   async signIn(createUserDto: CreateUserDto, res: Response) {
     const { username, password } = createUserDto;
+    console.log(1);
 
     if (!username || !password)
       throw new BadRequestException('Username or Password not found');
@@ -55,11 +59,15 @@ export class AuthService {
         throw new UnauthorizedException('Username or Password INVALID');
       }
 
-      const token = await this.jwtService.signAsync({ userId: user.id });
+      // const token = await this.jwtService.signAsync({ userId: user.id });
+
+      const uuid = uuidv4();
+
+      await this.redisService.setCache(uuid,{userId:user.id},300000) 
 
       await this.saveOtpInMongo(user.id);
 
-      return res.setHeader('Authorization', token).status(200).json({
+      return res.setHeader('Authorization', uuid).status(200).json({
         status: 'success',
         data: {
           user,

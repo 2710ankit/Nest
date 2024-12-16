@@ -19,7 +19,7 @@ import { RedisService } from './redis.service';
 
         return {
           store: store as unknown as CacheStore,
-          ttl: 10, // 3 minutes (milliseconds)
+          ttl: 0, // 3 minutes (milliseconds)
         };
       },
     }),

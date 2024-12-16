@@ -9,6 +9,7 @@ import { TaskLog, TaskLogSchema } from './schema/tasks-logs.schema';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import { MulterModule } from '@nestjs/platform-express';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -18,8 +19,9 @@ import { MulterModule } from '@nestjs/platform-express';
       { name: Otp.name, schema: OtpSchema },
     ]),
     MulterModule.register({
-      dest: './uploads', 
+      dest: './uploads',
     }),
+    RedisModule
   ],
   controllers: [TasksController],
   providers: [TasksService, AuthService],

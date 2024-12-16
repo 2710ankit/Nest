@@ -66,8 +66,7 @@ export class TasksService {
     }
   } 
   async findAll(req: Request) {
-    const { userId } = this.jwtService.decode(req.header('Authorization'));
-    console.log(req.header("Authorization"), userId)
+    const { userId } = this.jwtService.decode(req.header('Authorization')); 
     try {
       let searchQuery = {};
       const user = await this.authService.findOne(userId); 
