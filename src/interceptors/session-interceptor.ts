@@ -18,11 +18,11 @@ export class SessionInterceptor implements NestInterceptor {
     const req = ctx.getRequest();
 
     const token = req.headers.authorization;
-    const user = await this.redisService.getCache(token);
+    const user = await this.redisService.getCache(token); 
 
     if (req.url === '/api/auth/login' && !user) return next.handle();
     if (user) {
-      this.redisService.setCache(token, user, 300000);
+      this.redisService.setCache(token, user);
     } else {
       throw new UnauthorizedException();
     }

@@ -14,7 +14,7 @@ export const databaseProviders = [
     entities: [],
     synchronize: true,
     autoLoadEntities: true,
-    // logging:"all",
+    // logging:["query"],
     // logger:new TaskLogger()
   }),
 

@@ -24,13 +24,13 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  // @UseInterceptors(FileInterceptor('file'))
   create(@Body() createTaskDto: CreateTaskDto, @Req() req: Request) {
-    return this.tasksService.create(createTaskDto,req);
+    return this.tasksService.create(createTaskDto, req);
   }
 
   @Get()
-  findAll(@Req() req:Request) {
+  findAll(@Req() req: Request) {
     return this.tasksService.findAll(req);
   }
 
@@ -45,14 +45,13 @@ export class TasksController {
   }
 
   @Delete(':id')
-  remove(@Req() req:Request, @Param('id') id: string) {
+  remove(@Req() req: Request, @Param('id') id: string) {
     return this.tasksService.remove(req, id);
   }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
     return this.tasksService.uploadFile(file);
-}
+  }
 }

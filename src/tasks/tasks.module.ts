@@ -10,10 +10,15 @@ import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { RedisModule } from 'src/redis/redis.module';
+import { Category } from './entities/category.entity';
+import { Comment } from './entities/comment.entity';
+import { Post } from './entities/posts.entity';
+import { Tag } from './entities/tags.entity';
+import { Users } from './entities/users.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Task, User]),
+    TypeOrmModule.forFeature([Task, User, Category, Comment, Post, Tag, Users]),
     MongooseModule.forFeature([
       { name: TaskLog.name, schema: TaskLogSchema },
       { name: Otp.name, schema: OtpSchema },
@@ -21,7 +26,7 @@ import { RedisModule } from 'src/redis/redis.module';
     MulterModule.register({
       dest: './uploads',
     }),
-    RedisModule
+    RedisModule,
   ],
   controllers: [TasksController],
   providers: [TasksService, AuthService],
